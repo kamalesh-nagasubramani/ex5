@@ -6,23 +6,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 from sklearn.preprocessing import LabelEncoder
-
-# student roll numbers (Placeholder - You can replace this)
-# Roll Number: 24BAD000 (Example)
-
 def run_dt_scenario():
     print("--- SCENARIO 2: DECISION TREE CLASSIFIER ---")
-    
-    # 1. Load the Loan Prediction dataset
     data_path = r'c:\Users\kamal\Downloads\archive (9)\train_u6lujuX_CVtuZ9i (1).csv'
     df = pd.read_csv(data_path)
-    
-    # 2. Perform preprocessing
     print("\nInitial Info:")
     print(df.info())
-    
-    # Handle missing values
-    # For numerical, use median; for categorical, use mode
     df['LoanAmount'] = df['LoanAmount'].fillna(df['LoanAmount'].median())
     df['Loan_Amount_Term'] = df['Loan_Amount_Term'].fillna(df['Loan_Amount_Term'].mode()[0])
     df['Credit_History'] = df['Credit_History'].fillna(df['Credit_History'].mode()[0])
@@ -30,25 +19,16 @@ def run_dt_scenario():
     df['Married'] = df['Married'].fillna(df['Married'].mode()[0])
     df['Dependents'] = df['Dependents'].fillna(df['Dependents'].mode()[0])
     df['Self_Employed'] = df['Self_Employed'].fillna(df['Self_Employed'].mode()[0])
-    
-    # Selecting requested features
     features = ['ApplicantIncome', 'LoanAmount', 'Credit_History', 'Education', 'Property_Area']
     X = df[features]
     y = df['Loan_Status']
-    
-    # Encode categorical variables
     le = LabelEncoder()
     X['Education'] = le.fit_transform(X['Education'])
     X['Property_Area'] = le.fit_transform(X['Property_Area'])
-    y = le.fit_transform(y)  # Y -> 1, N -> 0
-    
-    # 3. Split dataset into training and testing sets
+    y = le.fit_transform(y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    # 4. Train a Decision Tree classifier (Experiment with tree depth)
     depths = [2, 3, 5, 10, None]
     results = []
-    
     for d in depths:
         dt = DecisionTreeClassifier(max_depth=d, random_state=42)
         dt.fit(X_train, y_train)
@@ -56,24 +36,16 @@ def run_dt_scenario():
         test_acc = accuracy_score(y_test, dt.predict(X_test))
         results.append((d, train_acc, test_acc))
         print(f"Depth {d}: Train Acc = {train_acc:.4f}, Test Acc = {test_acc:.4f}")
-
-    # 5. Detect overfitting behavior (Comparing shallow vs deep trees)
     print("\nObservation on Overfitting:")
     print("If Training Accuracy is much higher than Testing Accuracy as depth increases, overfitting is occurring.")
-    
-    # 6. Train the final model (let's use max_depth=3 for a good balance/shallow tree)
     best_dt = DecisionTreeClassifier(max_depth=3, random_state=42)
     best_dt.fit(X_train, y_train)
-    y_pred = best_dt.predict(X_test)
-    
-    # 7. Evaluate performance
+    y_pred = best_dt.
     print("\nFinal Model Performance (Depth=3):")
     print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
     print(f"Precision: {precision_score(y_test, y_pred):.4f}")
     print(f"Recall: {recall_score(y_test, y_pred):.4f}")
     print(f"F1 Score: {f1_score(y_test, y_pred):.4f}")
-    
-    # Visualization: Confusion Matrix
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Greens', xticklabels=['Rejected', 'Approved'], yticklabels=['Rejected', 'Approved'])
@@ -82,15 +54,11 @@ def run_dt_scenario():
     plt.ylabel('Actual')
     plt.savefig(r'c:\Users\kamal\Downloads\dt_confusion_matrix.png')
     plt.close()
-    
-    # Visualization: Tree Structure Plot
     plt.figure(figsize=(20, 10))
     plot_tree(best_dt, feature_names=features, class_names=['Rejected', 'Approved'], filled=True)
     plt.title('Decision Tree Structure (Max Depth 3)')
     plt.savefig(r'c:\Users\kamal\Downloads\dt_tree_structure.png')
     plt.close()
-    
-    # Visualization: Feature Importance Plot
     importance = best_dt.feature_importances_
     plt.figure(figsize=(10, 6))
     sns.barplot(x=importance, y=features)
@@ -99,8 +67,8 @@ def run_dt_scenario():
     plt.ylabel('Feature')
     plt.savefig(r'c:\Users\kamal\Downloads\dt_feature_importance.png')
     plt.close()
-    
     print("\nVisualizations saved to c:\\Users\\kamal\\Downloads")
 
 if __name__ == "__main__":
     run_dt_scenario()
+
